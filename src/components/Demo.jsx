@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react"
 import { copy, linkIcon, tick, loader } from "../assets"
 
 import { useLazyGetSummaryQuery } from "../services/article";
-
+import {useLazyGetTranslatedQuery} from '../services/translator'
 const Demo = () => {
 
 
@@ -12,28 +12,45 @@ const Demo = () => {
     summary: ''
   });
 
-  const [allArticles, setAllArticles] = useState([])
-const [copied , setCopied] = useState("")
-  const [getSummary, { error, isFetchig }] = useLazyGetSummaryQuery();
+  const [translate , setTranslate]= useState('')
 
+  const [allArticles, setAllArticles] = useState([])
+const [copied , setCopied] = useState("");
+
+// rtk lazy query
+  const [getSummary, { error, isFetching }] = useLazyGetSummaryQuery();
+ const [getTranslated , {err, isTranslating}] = useLazyGetTranslatedQuery();
+  //load data from local storage on mount
   useEffect(() => {
     const articlesFromLocalStorage = JSON.parse(
       localStorage.getItem('articles')
-    )
+    );
 
     if (articlesFromLocalStorage) {
       setAllArticles(articlesFromLocalStorage)
     }
   }, [])
 
+
+
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const existingArticle = allArticles.find(
+      (item) => item.url=== article.url
+    );
+
+    if(existingArticle) return setArticle(existingArticle);
+
     const { data } = await getSummary({ articleUrl: article.url });
 
     if (data?.summary) {
       const newArticle = { ...article, summary: data.summary };
       const updatedAllArticles = [newArticle, ...allArticles];
 
+      //update state and localstorage
       setArticle(newArticle);
       setAllArticles(updatedAllArticles);
 
@@ -43,7 +60,15 @@ const [copied , setCopied] = useState("")
       console.log(updatedAllArticles)
     }
 
+  };
+  const handleSubmitTrans = (newArticle) =>{
+ 
+const {data} = newArticle
+    console.log(data,"trans")
+  
   }
+  
+  //copy the url and toggle the icon for user feedback
 
   const handleCopy = (copyUrl) =>{
 setCopied(copyUrl);
@@ -54,7 +79,8 @@ setTimeout(() => setCopied(false) , 3000)
   return (
     <section className="w-full mt-16 max-w-xl">
       <div className="flex flex-col w-full gap-2">
-        <form className="relative flex justify-center items-center" onSubmit={handleSubmit}>
+        <form className="relative flex justify-center items-center"
+         onSubmit={handleSubmit}>
 
           <img
             src={linkIcon}
@@ -83,7 +109,7 @@ setTimeout(() => setCopied(false) , 3000)
         </form>
         {/* browse url history */}
         <div className="flex flex-col gap-1 max-h-60 overflow-y-auto">
-          {allArticles.map((item, index) => (
+          {allArticles.reverse().map((item, index) => (
             <div
               key={`link-${index}`}
               onClick={() => setArticle(item)}
@@ -92,7 +118,7 @@ setTimeout(() => setCopied(false) , 3000)
               <div className="copy_btn" onClick={() => handleCopy(item.url)}>
                 <img
                   src={copied === item.url ? tick : copy}
-                  alt="copy-icon"
+                  alt={copied === item.url ? "tick_icon" : "copy_icon"}
                   className="w-[40%] h-[40%] object-contain"
                 />
               </div>
@@ -113,7 +139,8 @@ setTimeout(() => setCopied(false) , 3000)
       {/* display results */}
       <div className="my-10 max-w-full flex justify-center 
       items-center">
-        {isFetchig ? (
+
+        {isFetching ? (
           <img src={loader} alt="loader" className="w-20 h-20 object-contain" />
         ) : error ? (
           <p className="font-inter font-bold text-black">
@@ -128,12 +155,19 @@ setTimeout(() => setCopied(false) , 3000)
           article.summary && (
             <div className="flex flex-col gap-3">
               <h2 className="font-bold font-satoshi text-gray-600 text-xl">
-                Article <span className="blue_gradient">Summary</span>
+                خلاصه <span className="blue_gradient">مقاله</span>
               </h2>
 
               <div className="summary_box">
 <p className="font-inter font-medium text-sm text-gray-700">{article.summary}</p>
               </div>
+              <button 
+              className="black_btn"
+              type="submit"
+              onClick={handleSubmitTrans}
+              >
+                ترجمه کن
+              </button>
             </div>
           )
         )}

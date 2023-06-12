@@ -9,16 +9,16 @@ const Hero = () => {
                 type="button"
                 onClick={() => window.open('https://github.com/Mehrdad-Mh')}
                 className="black_btn"
-                >My Github</button>
+                >صفحه Github</button>
             </nav>
             <h1 className="head_text">
-                summarize article with<br className="max-md:hidden"/>
+                مقاله هارو خلاصه کن با<br className="max-md:hidden"/>
                 <span className="orange_gradient "> OPEN AI GPT-4</span>
             </h1>
             <h2 className="desc">
-Simplify your reading with summize,
-an open-source article summarizer that transform lengthy articles into 
-clear and concise summarize
+            خواندن خود را با خلاصه کردن ساده کنید 
+            خلاصه کننده مقاله OPEN AI GPT-4 
+            این امکان را به شما می دهد که مقالات را به طور خلاصه و موثر مطالعه کنید
             </h2>
         </header>
     )
